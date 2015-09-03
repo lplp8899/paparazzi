@@ -1986,6 +1986,7 @@
     <field name="vely_Ned"   type="float"/>
     <field name="z_sonar"    type="float"/>
     <field name="count"      type="int32"/>
+    <field name="yaw_ref"    type="float"/>
  </message>
 
   <message name="VISION_STABILIZATION" id="229">

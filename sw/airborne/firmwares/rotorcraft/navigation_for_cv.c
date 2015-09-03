@@ -50,13 +50,16 @@
 
 
 //---------------------- added by Peng -----------------------//
-/* for computer vision
+
 #include "modules/computer_vision_Lu/opticflow/opticflow_thread.h"
-*/
 
 //---------------------- added by Peng -----------------------//
 
+//---------------------- added for test -----------------------//
 
+//#include "modules/computer_vision_test/vision_sim.h"
+
+//---------------------- added by test -----------------------//
 
 
 struct EnuCoor_i navigation_target;
@@ -513,7 +516,93 @@ bool_t nav_set_heading_deg(float deg)
 
 /**
 /*---------------------- added by Peng -----------------------*/
-/* this is for the UAV course, please refer to "navigation_for_cv.c"
+
+/*----------- get the turn reference -------------*/
+float turn_ref_vision(void)
+{
+  
+  /*return yaw_ref_sim; */
+  /*return yaw_ref; */
+
+  float heading_ref_turn = yaw_ref_fun();
+  printf("heading ref = %f\n",yaw_ref);
+  return heading_ref_turn;
+
+}
+
+
+/*---------- Set nav_heading in degrees. ----------*/
+bool_t set_heading_ref_vision(void)
+{
+  float turn_ref = yaw_ref_fun();
+  /*float turn_ref = yaw_ref_sim; */
+  /*float turn_ref = yaw_ref; */
+  /*float turn_ref = 45.0; */
+  /*float turn_ref = cmd_euler_psi; */
+  float nav_heading_f = stateGetNedToBodyEulers_f()->psi; //integer rad
+  /*float nav_heading_f = nav_heading_i + (turn_ref*pow(2, 12))/pow(2, 13); */
+  float heading_sum = turn_ref + nav_heading_f*57.3;
+  
+  /* also need to bound the heading */
+  
+  printf("heading ref = %f\n",turn_ref);
+  return nav_set_heading_deg(heading_sum);
+  
+/*  printf("heading = %f\n",heading_sum); */
+  /*return nav_set_heading_deg(nav_heading_f+turn_ref); */
+}
+
+/* get current heading  */
+float heading_current(void)
+{
+  float current_heading_f = stateGetNedToBodyEulers_i()->psi;
+  return current_heading_f;
+}
+
+/*bool_t set_heading_to_ref_vision(void)
+/*{*/
+/*  float set_heading_ref = heading_ref_vision();
+ /* float nav_heading_f = stateGetNedToBodyEulers_i()->psi;
+ /* return nav_set_heading_deg(set_heading_ref + nav_heading_f);
+  /*nav_set_heading_deg(set_heading_ref);
+/*} */
+
+
+
+float wp_change_x(void)
+{
+  /*float wp_current_x = WaypointX(WP_NEXT);*/
+  float wp_current_x = GetPosX();
+  float wp_next_x = wp_current_x + 0.5*255;
+  return wp_next_x;
+  
+  /*if (opticflow_thread_giveresult()==0)
+                /*return (1.1*WaypointX(WP_NEXT)/256 - 0.1*GetPosX())*256;
+        /*else if (opticflow_thread_giveresult()==1)
+        /*return (1.1*WaypointX(WP_NEXT)/256 + 0.1*GetPosX())*256;
+                /*return (GetPosX() + 2/sqrt(pow((GetPosX() - WaypointX(WP_NEXT)/256),2)+pow((GetPosY() - WaypointY(WP_NEXT)/256),2))*(WaypointY(WP_NEXT)/256 - GetPosY()))*256; 
+        /*else 
+                /*return (GetPosX() - 2/sqrt(pow((GetPosX() - WaypointX(WP_NEXT)/256),2)+pow((GetPosY() - WaypointY(WP_NEXT)/256),2))*(WaypointY(WP_NEXT)/256 - GetPosY()))*256; 
+
+*/
+}
+
+float wp_change_y(void)
+{
+/*  float wp_current_y = WaypointY(WP_NEXT);*/
+  float wp_current_y = GetPosY();
+  float wp_next_y = wp_current_y - 0.5*255;
+  return wp_next_y;
+  
+  /*if (opticflow_thread_giveresult()==0)
+              /*  return (1.5*WaypointY(WP_NEXT)/256 - 0.5*GetPosY())*256;
+      /* else if (opticflow_thread_giveresult()==1)
+      /* return (1.5*WaypointY(WP_NEXT)/256 + 0.5*GetPosY())*256;
+                /*return (GetPosY() - 3/sqrt(pow((GetPosX() - WaypointX(WP_NEXT)/256),2)+pow((GetPosY() - WaypointY(WP_NEXT)/256),2))*(WaypointX(WP_NEXT)/256 - GetPosX()))*256;
+        /*else 
+                /*return  (GetPosY() + 3/sqrt(pow((GetPosX() - WaypointX(WP_NEXT)/256),2)+pow((GetPosY() - WaypointY(WP_NEXT)/256),2))*(WaypointX(WP_NEXT)/256 - GetPosX()))*256;
+                
+}
 
 /*---------------------- added by Peng -----------------------*/
 

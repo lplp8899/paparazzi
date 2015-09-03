@@ -47,4 +47,14 @@ extern void motor_mixing_init(void);
 extern void motor_mixing_run(bool_t motors_on, bool_t override_on, pprz_t in_cmd[]);
 extern void motor_mixing_run_spinup(uint32_t counter, uint32_t max_counter);
 
+
+//--------------- for actuator failure -----------------
+extern bool_t LOE_on;
+extern float LOE_1;
+extern float LOE_2;
+extern float LOE_3;
+extern float LOE_4;
+//--------------- for actuator failure -----------------
+
+
 #endif /* MOTOR_MIXING_H */

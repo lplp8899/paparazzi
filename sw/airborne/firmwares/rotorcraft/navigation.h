@@ -34,6 +34,7 @@
 #include "subsystems/navigation/waypoints.h"
 #include "subsystems/navigation/common_flight_plan.h"
 
+
 #define NAV_FREQ 16
 
 extern struct EnuCoor_i navigation_target;
@@ -83,6 +84,21 @@ unit_t nav_reset_alt(void) __attribute__((unused));
 void nav_periodic_task(void);
 bool_t nav_detect_ground(void);
 bool_t nav_is_in_flight(void);
+
+
+
+//---------------------- added by Peng -----------------------//
+/* added for computer vision
+extern float turn_ref_vision(void);
+extern bool_t set_heading_ref_vision(void);
+extern float heading_current(void);
+//extern bool_t set_heading_to_ref_vision(void);
+extern float wp_change_x(void);
+extern float wp_change_y(void);
+* added for computer vision */
+//---------------------- added by Peng -----------------------//
+
+
 
 extern bool_t nav_set_heading_rad(float rad);
 extern bool_t nav_set_heading_deg(float deg);

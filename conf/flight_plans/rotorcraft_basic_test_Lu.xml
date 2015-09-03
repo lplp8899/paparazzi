@@ -1,0 +1,211 @@
+<!DOCTYPE flight_plan SYSTEM "flight_plan.dtd">
+
+<flight_plan alt="0" ground_alt="0" lat0="51.990634" lon0="4.376789" max_dist_from_home="50" name="challenge team 6" security_height=".7">
+  <header>
+#include "autopilot.h"
+#include "generated/modules.h"
+  </header>
+  <waypoints>
+    <waypoint name="HOME" x="0.0" y="0.0" height="1.2" />
+    <waypoint name="CLIMB" x="0.0" y="2.0" height="1.2" />
+    <waypoint name="STDBY" x="-2.0" y="-2.0" height="1.2" />
+    <waypoint name="TD" x="0.6" y="-0.9" height="1.2" />
+    <waypoint name="HERE" x="0.4" y="-0.9" height="1.2" />
+    <waypoint name="NEXT" x="-0.2" y="0.5"/>
+    <waypoint lat="51.990639" lon="4.376807" height="1.2" name="p1"/>
+    <waypoint lat="51.990624" lon="4.376767" height="1.2" name="p2"/>
+    <waypoint lat="51.990648" lon="4.376745" height="1.2" name="p3"/>
+    <waypoint lat="51.990663" lon="4.376784" height="1.2" name="p5"/>
+    <waypoint lat="51.990635" lon="4.376836" height="1.2" name="FA1"/>
+    <waypoint lat="51.990606" lon="4.376760" height="1.2" name="FA2"/>
+    <waypoint lat="51.990652" lon="4.376712" height="1.2" name="FA3"/>
+    <waypoint lat="51.990681" lon="4.376791" height="1.2" name="FA4"/>
+    <waypoint name="CAM" x="-20" y="-50" height="0."/>
+    
+    <!--waypoint name="HOME" x="0.0" y="0.0" alt="1.5"/>
+    <waypoint name="CLIMB" x="0.0" y="5.0" alt="1.5"/>
+    <waypoint name="STDBY" x="-2.0" y="-5.0" alt="1.5"/>
+    <waypoint name="TD" x="0.6" y="0.9" alt="1.5"/>
+    <waypoint name="HERE" x="0.4" y="0.9" alt="1.5"/>
+    <waypoint name="CAM" x="-20" y="-50" height="0."/>
+    <waypoint lat="51.990639" lon="4.376797" alt="1.5" name="p1"/>
+    <waypoint lat="51.990629" lon="4.376777" alt="1.5" name="p2"/>
+    <waypoint lat="51.990638" lon="4.376775" alt="1.5" name="p3"/>
+    <waypoint lat="51.990641" lon="4.376784" alt="1.5" name="p4"/>
+    <waypoint lat="51.990635" lon="4.376836" alt="1.5" name="FA1"/>
+    <waypoint lat="51.990606" lon="4.376760" alt="1.5" name="FA2"/>
+    <waypoint lat="51.990652" lon="4.376712" alt="1.5" name="FA3"/>
+    <waypoint lat="51.990681" lon="4.376791" alt="1.5" name="FA4"/-->
+    
+  </waypoints>
+  <sectors>
+    <sector color="red" name="Flight_Area">
+      <corner name="FA4"/>
+      <corner name="FA3"/>
+      <corner name="FA2"/>
+      <corner name="FA1"/>
+    </sector>
+  </sectors>
+  <blocks>
+  
+    <block name="Wait GPS">
+      <call fun="NavKillThrottle()"/>
+      <while cond="!GpsFixValid()"/>
+    </block>
+   
+    <block name="Geo init">
+      <while cond="LessThan(NavBlockTime(), 10)"/>
+      <call fun="NavSetWaypointHere(WP_HOME)"/>
+      <call fun="NavSetWaypointHere(WP_CLIMB)"/>
+      <call fun="NavSetWaypointHere(WP_STDBY)"/>
+      <call fun="NavSetWaypointHere(WP_TD)"/>
+      <call fun="NavSetAltitudeReferenceHere()"/>
+    </block>
+   
+    <block name="Holding point">
+      <call fun="NavKillThrottle()"/>
+      <attitude pitch="0" roll="0" throttle="0" vmode="throttle" until="FALSE"/>
+    </block>
+    <block name="Takeoff" strip_button="Takeoff" strip_icon="takeoff.png">
+    <call fun="NavResurrect()"/>
+      <exception cond="stateGetPositionEnu_f()->z > 2.0" deroute="Standby"/>
+      <call fun="NavSetWaypointHere(WP_CLIMB)"/>
+      <stay vmode="climb" climb="0.5" wp="CLIMB"/>
+    </block>
+    <block name="Standby" strip_button="Standby" strip_icon="home.png">
+      <stay wp="STDBY"/>
+    </block>
+<!--
+    <block name="real_mission">
+     <exception cond="vision_results.yaw_ref = 45" deroute="turn_left"/>
+     <exception cond="vision_results.yaw_ref = -45" deroute="turn_right"/>
+      <go from="p1" hmode="route" wp="p2"/>
+      <stay wp="p2" until="stage_time>2"/>
+    </block>-->
+    
+    <block name="turn_left">
+      <call fun="NavSetWaypointHere(WP_HERE)"/>
+      <call fun="nav_set_heading_deg(45)"/>
+      <!--deroute block="real_mission"/>-->
+      <stay wp="HERE"/>
+    </block>
+    <block name="turn_right">
+      <call fun="NavSetWaypointHere(WP_HERE)"/>
+      <call fun="nav_set_heading_deg(200)"/>
+      <!--deroute block="real_mission"/-->
+      <stay wp="HERE"/>
+    </block>
+    
+    <block name="stay_p1">
+      <call fun="nav_set_heading_deg(90)"/>
+      <go wp="p1"/>
+      <stay wp="p1"/>
+    </block>
+    
+    <block name="go_p1">
+      <go wp="p1"/>
+      
+      <stay wp="p1" until="stage_time>5"/>
+      <call fun="nav_set_heading_deg(90)"/>
+      <exception cond="heading_current() > 360.0" deroute="go_p2"/>
+      <!--exception cond="0.0 > turn_ref_vision() " deroute="go_p4"/-->
+      <deroute block="go_p3"/>
+    </block>
+    <block name="go_p2">
+      <go from="p1" hmode="route" wp="p2"/>
+      <stay wp="p2" until="stage_time>5"/>
+      <call fun="nav_set_heading_deg(180)"/>
+      <!--stay wp="p2" until="stage_time>10"/-->
+      <exception cond="heading_current() > 270.0" deroute="go_p3"/>
+      <!--exception cond="0.0 > turn_ref_vision() " deroute="go_p1"/-->
+      <deroute block="go_p1"/>
+    </block>
+    <block name="go_p3">
+      <go from="p2" hmode="route" wp="p3"/>
+      
+      <call fun="nav_set_heading_deg(270)"/>
+      <stay wp="p3" until="stage_time>5"/>
+      <exception cond="heading_current() > 180.0" deroute="go_p1"/>
+      <!--exception cond="0.0 > turn_ref_vision() " deroute="go_p2"/-->
+      <deroute block="go_p2"/>
+    </block>
+    <block name="go_p4">
+      <go from="p3" hmode="route" wp="p5"/>
+      
+      <call fun="nav_set_heading_deg(160)"/>
+      <stay wp="p5" until="stage_time>5"/>
+      <exception cond="heading_current() > 270.0" deroute="go_p1"/>
+      <!--exception cond="0.0 > turn_ref_vision() " deroute="go_p3"/-->
+      <deroute block="go_p3"/>
+    </block>
+      
+       
+    <block name="change points"> 
+    <while cond="LessThan(NavBlockTime(), 60)"> 
+       <!--stay wp="NEXT" until="stage_time>4"/-->
+       <set var="waypoints[WP_NEXT].enu_i.x" value="wp_change_x()"/> 
+       <set var="waypoints[WP_NEXT].enu_i.y" value="wp_change_y()"/>  
+       <go wp="NEXT"/>
+       <stay wp="NEXT" until="stage_time>5"/>
+       </while>
+    </block>
+    
+    
+    <block name="set_heading_vision">
+       <!--call fun="vision_set_heading_deg()" /-->
+       <call fun="set_heading_ref_vision()"/>
+       <call fun="NavSetWaypointHere(WP_HERE)"/>
+       <stay wp="HERE" />
+       <!--stay wp="HERE" until="stage_time>2"/-->
+       <!--deroute block="test_heading_vision"/-->
+    </block>
+    <block name="test_heading_vision">
+      <!--while cond ="TRUE"/-->
+       <!--call fun="vision_set_heading_deg()" /-->
+      <call fun="set_heading_ref_vision()"/>
+      <call fun="NavSetWaypointHere(WP_HERE)"/>
+      <!--call fun="nav_set_heading_deg(180)"/-->
+      <stay wp="HERE" until="stage_time>2"/>
+      <deroute block="set_heading_vision"/>
+      <!--stay wp="HERE"/-->
+    </block>
+       
+    <block name="line_p1_p2">
+      <go from="p1" hmode="route" wp="p2"/>
+      <stay wp="p2" until="stage_time>10"/>
+      <go from="p2" hmode="route" wp="p1"/>
+      <deroute block="stay_p1"/>
+    </block>
+    <block name="route">
+      <go wp="p1"/>
+      <stay wp="p1" until="stage_time>10"/>
+      <go from="p1" hmode="route" wp="p2"/>
+      <stay wp="p2" until="stage_time>10"/>
+      <go from="p2" hmode="route" wp="p3"/>
+      <stay wp="p3" until="stage_time>10"/>
+      <go from="p3" hmode="route" wp="p5"/>
+      <stay wp="p5" until="stage_time>10"/>
+      <go from="p5" hmode="route" wp="p1"/>
+      <deroute block="stay_p1"/>
+    </block>
+    <block name="circle CAM" pre_call="nav_set_heading_towards_waypoint(WP_CAM)">
+      <circle radius="nav_radius" wp="CAM"/>
+    </block>
+    
+    <block name="land here" strip_button="Land Here" strip_icon="land-right.png">
+      <call fun="NavSetWaypointHere(WP_TD)"/>
+    </block>
+    <block name="land">
+      <go wp="TD"/>
+    </block>
+    <block name="flare">
+      <exception cond="NavDetectGround()" deroute="Holding point"/>
+      <exception cond="!nav_is_in_flight()" deroute="landed"/>
+      <call fun="NavStartDetectGround()"/>
+      <stay climb="-0.8" vmode="climb" wp="TD"/>
+    </block>
+    <block name="landed">
+      <attitude pitch="0" roll="0" throttle="0" vmode="throttle" until="FALSE"/>
+    </block>
+  </blocks>
+</flight_plan>

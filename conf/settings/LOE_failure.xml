@@ -1,0 +1,15 @@
+<!DOCTYPE settings SYSTEM "settings.dtd">
+
+<!-- A conf to use for simulating loss of effectiveness-->
+
+<settings>
+  <dl_settings>
+    <dl_settings NAME="Rotor_failure" >	
+      <dl_setting VAR="LOE_on" MIN="0" STEP="1" MAX="1" module="subsystems/actuators/motor_mixing" shortname="enable_loe"/>
+      <dl_setting VAR="LOE_1" MIN="0" STEP="0.01" MAX="1" module="subsystems/actuators/motor_mixing" shortname="LOE 1"/>
+      <dl_setting VAR="LOE_2" MIN="0" STEP="0.01" MAX="1" module="subsystems/actuators/motor_mixing" shortname="LOE 2"/>
+      <dl_setting VAR="LOE_3" MIN="0" STEP="0.01" MAX="1" module="subsystems/actuators/motor_mixing" shortname="LOE 3"/>
+      <dl_setting VAR="LOE_4" MIN="0" STEP="0.01" MAX="1" module="subsystems/actuators/motor_mixing" shortname="LOE 4"/>
+    </dl_settings>
+  </dl_settings>
+</settings>
