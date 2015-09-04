@@ -91,6 +91,16 @@ static const int32_t pitch_coef[MOTOR_MIXING_NB_MOTOR]  = MOTOR_MIXING_PITCH_COE
 static const int32_t yaw_coef[MOTOR_MIXING_NB_MOTOR]    = MOTOR_MIXING_YAW_COEF;
 static const int32_t thrust_coef[MOTOR_MIXING_NB_MOTOR] = MOTOR_MIXING_THRUST_COEF;
 
+
+//--------------- for actuator failure -----------------
+bool_t LOE_on = FALSE;
+float LOE_1 = 0.;
+float LOE_2 = 0.;
+float LOE_3 = 0.;
+float LOE_4 = 0.;
+//--------------- for actuator failure -----------------
+  
+ 
 struct MotorMixing motor_mixing;
 
 void motor_mixing_init(void)
@@ -268,4 +278,18 @@ void motor_mixing_run(bool_t motors_on, bool_t override_on, pprz_t in_cmd[])
       motor_mixing.commands[i] = MOTOR_MIXING_STOP_MOTOR;
     }
   }
+  
+  
+  //--------------- for actuator failure -----------------
+  /* The actuator (including motor) failure */
+  if (LOE_on)
+  {
+     motor_mixing.commands[0] = motor_mixing.commands[0] *( sqrt(1 - LOE_1) );
+     motor_mixing.commands[1] = motor_mixing.commands[1] *( sqrt(1 - LOE_2) );
+     motor_mixing.commands[2] = motor_mixing.commands[2] *( sqrt(1 - LOE_3) );
+     motor_mixing.commands[3] = motor_mixing.commands[3] *( sqrt(1 - LOE_4) );
+  }
+  //--------------- for actuator failure -----------------
+  
+ 
 }
