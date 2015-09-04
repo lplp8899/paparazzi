@@ -262,7 +262,10 @@ static void attitude_run_fb(int32_t Com_actu[], struct Int32AttitudeGains *gains
    in_c.r = in_0_f.r + de_in.r;
     
       
- 
+   //bound the total control input
+  Bound(in_c.p, -4500, 4500);
+  Bound(in_c.q, -4500, 4500);
+  Bound(in_c.r, -4500, 4500);
      
    // 
    // ? should convert to int!
@@ -287,7 +290,16 @@ static void attitude_run_fb(int32_t Com_actu[], struct Int32AttitudeGains *gains
    filter_low_pass_2nd_scalar(&in_0_f.q, &in_dot_filter.q, &in_ddot_filter.q, &zeta_f, &omega_f, &in.q);
    filter_low_pass_2nd_scalar(&in_0_f.r, &in_dot_filter.r, &in_ddot_filter.r, &zeta_f, &omega_f, &in.r); 
    
+    ///*
+   //Don't increment if thrust is off
+  if (stabilization_cmd[COMMAND_THRUST] < 300) {
+    FLOAT_RATES_ZERO(in);
+    FLOAT_RATES_ZERO(in_c);
+    FLOAT_RATES_ZERO(de_in);
+    //FLOAT_RATES_ZERO(in_0_f);
 
+  }
+   //*/
    
 }
 
