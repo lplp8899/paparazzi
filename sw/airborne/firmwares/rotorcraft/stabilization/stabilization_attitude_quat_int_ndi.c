@@ -60,11 +60,19 @@ struct Int32Quat stabilization_att_sum_err_quat;
 int32_t stabilization_att_fb_cmd[COMMANDS_NB];
 int32_t stabilization_att_ff_cmd[COMMANDS_NB];
 
+/*
 #define IERROR_SCALE 1024
 #define GAIN_PRESCALER_FF 48
 #define GAIN_PRESCALER_P 48
 #define GAIN_PRESCALER_D 48
 #define GAIN_PRESCALER_I 48
+*/
+#define IERROR_SCALE 1024
+#define GAIN_PRESCALER_FF 48
+#define GAIN_PRESCALER_P 12
+#define GAIN_PRESCALER_D 3
+#define GAIN_PRESCALER_I 24
+
 
 #if PERIODIC_TELEMETRY
 #include "subsystems/datalink/telemetry.h"
@@ -85,8 +93,8 @@ struct FloatRates in_dot_filter = {0., 0., 0.};
 struct FloatRates in_ddot_filter = {0., 0., 0.};
 
 
-struct FloatRates g1 = { 0.001, 0.001, 0.002 };
-float tau_act = 0.02; // actuator time constant
+struct FloatRates g1 = { 0.01, 0.01, 0.02 };
+float tau_act = 0.06; //0.02 actuator time constant
 float zeta_f = 0.8;
 float omega_f = 30.;
 
@@ -180,9 +188,15 @@ void stabilization_attitude_enter(void)
   //
   FLOAT_RATES_ZERO(in_0);
   FLOAT_RATES_ZERO(in_c);
-  FLOAT_RATES_ZERO(in_0_f);
+  FLOAT_RATES_ZERO(in);
   FLOAT_RATES_ZERO(de_in);
-  
+  FLOAT_RATES_ZERO(in_0_f);
+  FLOAT_RATES_ZERO(in_dot_filter);
+  FLOAT_RATES_ZERO(in_ddot_filter);
+  FLOAT_RATES_ZERO(w_filter);
+  FLOAT_RATES_ZERO(w_dot_0);
+  FLOAT_RATES_ZERO(w_ddot_filter);
+
   
 }
 
@@ -194,6 +208,7 @@ void stabilization_attitude_set_failsafe_setpoint(void)
   stab_att_sp_quat.qx = 0;
   stab_att_sp_quat.qy = 0;
   PPRZ_ITRIG_SIN(stab_att_sp_quat.qz, heading2);
+  
 }
 
 void stabilization_attitude_set_rpy_setpoint_i(struct Int32Eulers *rpy)
@@ -209,9 +224,19 @@ void stabilization_attitude_set_earth_cmd_i(struct Int32Vect2 *cmd, int32_t head
   // stab_att_sp_euler.psi still used in ref..
   stab_att_sp_euler.psi = heading;
 
+  //
+  float heading_f = heading * (1>>INT32_ANGLE_FRAC);
+  //printf("heading: %i\n",&heading);
+  printf("heading_f: %f\n",&heading_f);
+  
   // compute sp_euler phi/theta for debugging/telemetry
   /* Rotate horizontal commands to body frame by psi */
   int32_t psi = stateGetNedToBodyEulers_i()->psi;
+  
+  //
+  float psi_f = psi *(1 >> INT32_ANGLE_FRAC );
+  printf("psi: %f\n",&psi_f);
+  
   int32_t s_psi, c_psi;
   PPRZ_ITRIG_SIN(s_psi, psi);
   PPRZ_ITRIG_COS(c_psi, psi);
@@ -233,21 +258,21 @@ static void attitude_run_fb(int32_t Com_actu[], struct Int32AttitudeGains *gains
   struct FloatRates V_w;
   
   V_w.p = 
-    GAIN_PRESCALER_P * gains->p.x  * QUAT1_FLOAT_OF_BFP(att_err->qx) / 4. +
-    GAIN_PRESCALER_D * gains->d.x  * RATE_FLOAT_OF_BFP(rate_err->p) / 16. +
-    GAIN_PRESCALER_I * gains->i.x  * QUAT1_FLOAT_OF_BFP(sum_err->qx) / 2.;
+    GAIN_PRESCALER_P * gains->p.x  * QUAT1_FLOAT_OF_BFP(att_err->qx) +
+    GAIN_PRESCALER_D * gains->d.x  * RATE_FLOAT_OF_BFP(rate_err->p)  +
+    GAIN_PRESCALER_I * gains->i.x  * QUAT1_FLOAT_OF_BFP(sum_err->qx) ;
 
   //fb_commands[COMMAND_PITCH] =
   V_w.q = 
-    GAIN_PRESCALER_P * gains->p.y  * QUAT1_FLOAT_OF_BFP(att_err->qy) / 4. +
-    GAIN_PRESCALER_D * gains->d.y  * RATE_FLOAT_OF_BFP(rate_err->q)  / 16. +
-    GAIN_PRESCALER_I * gains->i.y  * QUAT1_FLOAT_OF_BFP(sum_err->qy) / 2.;
+    GAIN_PRESCALER_P * gains->p.y  * QUAT1_FLOAT_OF_BFP(att_err->qy)  +
+    GAIN_PRESCALER_D * gains->d.y  * RATE_FLOAT_OF_BFP(rate_err->q)   +
+    GAIN_PRESCALER_I * gains->i.y  * QUAT1_FLOAT_OF_BFP(sum_err->qy) ;
 
   //fb_commands[COMMAND_YAW] =
   V_w.r = 
-    GAIN_PRESCALER_P * gains->p.z  * QUAT1_FLOAT_OF_BFP(att_err->qz) / 4. +
-    GAIN_PRESCALER_D * gains->d.z  * RATE_FLOAT_OF_BFP(rate_err->r)  / 16. +
-    GAIN_PRESCALER_I * gains->i.z  * QUAT1_FLOAT_OF_BFP(sum_err->qz) / 2.;
+    GAIN_PRESCALER_P * gains->p.z  * QUAT1_FLOAT_OF_BFP(att_err->qz) +
+    GAIN_PRESCALER_D * gains->d.z  * RATE_FLOAT_OF_BFP(rate_err->r)  +
+    GAIN_PRESCALER_I * gains->i.z  * QUAT1_FLOAT_OF_BFP(sum_err->qz) ;
     
   
 
@@ -288,7 +313,7 @@ static void attitude_run_fb(int32_t Com_actu[], struct Int32AttitudeGains *gains
    in.r = in.r + (in_c.r - in.r) / tau_act / PERIODIC_FREQUENCY;
    
    //printf("%d\n", PERIODIC_FREQUENCY);
-   printf("%f\n", de_in.p);
+   //printf("%f\n", de_in.p);
          
    // do not forget to add the same delay to the actuator commands
    // low_pass_filter_2nd_order 
@@ -367,6 +392,9 @@ void stabilization_attitude_run(bool_t enable_integrator)
 
   // calculate the rate dot
   struct FloatRates *body_rate_f = stateGetBodyRates_f();
+  //
+  printf("rate_psi: %f\n",body_rate_f->r);
+  
   filter_low_pass_2nd_scalar(&w_filter.p, &w_dot_0.p, &w_ddot_filter.p, &zeta_f, &omega_f, &(*body_rate_f).p );
   filter_low_pass_2nd_scalar(&w_filter.q, &w_dot_0.q, &w_ddot_filter.q, &zeta_f, &omega_f, &(*body_rate_f).q );
   filter_low_pass_2nd_scalar(&w_filter.r, &w_dot_0.r, &w_ddot_filter.r, &zeta_f, &omega_f, &(*body_rate_f).r );

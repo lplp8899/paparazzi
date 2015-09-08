@@ -19,8 +19,7 @@
     <subsystem name="imu" type="ardrone2"/>
     <!-- gps: "ublox" or change to "sirf" for usage with parrot flight recorder -->
     <subsystem name="gps" type="ublox"/>
-    <!--subsystem name="stabilization" type="int_quat"/-->
-    <subsystem name="stabilization" type="int_quat_ndi"/>
+    <subsystem name="stabilization" type="int_quat"/>
     <subsystem name="ahrs" type="int_cmpl_quat"/>
     <subsystem name="ins" type="extended"/>
   </firmware>
@@ -57,11 +56,12 @@
 
     <!-- Time cross layout (X), with order NW (CW), NE (CCW), SE (CW), SW (CCW) -->
     <!--use 5.1 -->
-    <!--define name="ROLL_COEF" value="{   256, -256, -256,  256 }"/>
+    <define name="ROLL_COEF" value="{   256, -256, -256,  256 }"/>
     <define name="PITCH_COEF" value="{  256,  256, -256, -256 }"/>
     <define name="YAW_COEF" value="{   -256,  256, -256,  256 }"/>
-    <define name="THRUST_COEF" value="{ 256,  256,  256,  256 }"/-->
+    <define name="THRUST_COEF" value="{ 256,  256,  256,  256 }"/>
     <!--use 5.1 -->
+    
     <define name="TYPE" value="QUAD_X"/>
   </section>
 

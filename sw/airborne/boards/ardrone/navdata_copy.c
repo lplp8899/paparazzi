@@ -325,22 +325,6 @@ static void navdata_publish_imu(void)
   RATES_ASSIGN(imu.gyro_unscaled, navdata.measure.vx, -navdata.measure.vy, -navdata.measure.vz);
   VECT3_ASSIGN(imu.accel_unscaled, navdata.measure.ax, 4096 - navdata.measure.ay, 4096 - navdata.measure.az);
   VECT3_ASSIGN(imu.mag_unscaled, -navdata.measure.mx, -navdata.measure.my, -navdata.measure.mz);
-  
-  
-  /*------------------------- add IMU faults -------------------------*/
-  /* rate gyro
-  imu->gyro.p = -imu->gyro.p + 1;
-  imu->gyro.q = -imu->gyro.q + 1;
-  imu->gyro.r = -imu->gyro.r + 1;
-  // acc
-  imu->accel.x = -imu->accel.x + 1 ;  
-  imu->accel.y = -imu->accel.y + 1 ;  
-  imu->accel.z = -imu->accel.z + 1 ;  
-  //
-  printf("acc: %d\n",imu->accel.x);
-  */
-  /*------------------------- add IMU faults -------------------------*/  
-  
   imu_scale_gyro(&imu);
   imu_scale_accel(&imu);
   imu_scale_mag(&imu);

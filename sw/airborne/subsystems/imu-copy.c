@@ -35,13 +35,6 @@
 #ifdef IMU_POWER_GPIO
 #include "mcu_periph/gpio.h"
 
-
-//------------------------ add IMU faults ------------------------
-#include "subsystems/gps/gps_ubx.h"
-//------------------------ add IMU faults ------------------------
-
-
-
 #ifndef IMU_POWER_GPIO_ON
 #define IMU_POWER_GPIO_ON gpio_set
 #endif
@@ -226,46 +219,6 @@ void WEAK imu_scale_gyro(struct Imu *_imu)
                   IMU_GYRO_Q_SENS_NUM) / IMU_GYRO_Q_SENS_DEN;
   _imu->gyro.r = ((_imu->gyro_unscaled.r - _imu->gyro_neutral.r) * IMU_GYRO_R_SIGN *
                   IMU_GYRO_R_SENS_NUM) / IMU_GYRO_R_SENS_DEN;
-    
-  /**                
-  //------------------------ add IMU faults ------------------------
-  _imu->gyro.p = -_imu->gyro.p ;
-  _imu->gyro.q = -_imu->gyro.q ;
-  _imu->gyro.r = -_imu->gyro.r ;   
-  //
-  printf("IMU.p : %d\n", _imu->gyro.p);               
-  printf("IMU.q : %d\n", _imu->gyro.q);               
-  printf("IMU.r : %d\n", _imu->gyro.r);               
-  //------------------------ add IMU faults ------------------------                  
-  */ 
-  
-  // GPS measurements
-  // position in ECEF in cm
-  printf("GPS x: %f\n",gps.ecef_pos.x * 0.01);
-  printf("GPS y: %f\n",gps.ecef_pos.y * 0.01);
-  printf("GPS z: %f\n",gps.ecef_pos.z * 0.01);
-  // position in LLA (lat,lon: deg*1e7; alt: mm over ellipsoid)
-  printf("GPS l: %f\n",gps.lla_pos.lat / 1e7 /57.3);
-  printf("GPS l: %f\n",gps.lla_pos.lon / 1e7 /57.3);
-  printf("GPS a: %f\n",gps.lla_pos.alt * 0.001);
-  // position in UTM (north,east: cm; alt: mm over ellipsoid)
-  printf("GPS n: %f\n",gps.utm_pos.north * 0.01);
-  printf("GPS e: %f\n",gps.utm_pos.east * 0.01);
-  printf("GPS a: %f\n",gps.utm_pos.alt * 0.001);
-  
-  // velocity in ECEF in cm/s
-  printf("GPS vn: %f\n",gps.ecef_vel.x * 0.01);
-  printf("GPS ve: %f\n",gps.ecef_vel.y * 0.01);
-  printf("GPS vd: %f\n",gps.ecef_vel.z * 0.01);
-  // velocity in NED in cm/s
-  printf("GPS vn: %f\n",gps.ned_vel.x * 0.01);
-  printf("GPS ve: %f\n",gps.ned_vel.y * 0.01);
-  printf("GPS vd: %f\n",gps.ned_vel.z * 0.01);
-  // positon and speed accuracy in cm, cm/s
-  printf("GPS pos accuracy: %d\n",gps.pacc);
-  printf("GPS vel accuracy: %d\n",gps.sacc);
-  
-                 
 }
 
 void WEAK imu_scale_accel(struct Imu *_imu)
@@ -277,19 +230,6 @@ void WEAK imu_scale_accel(struct Imu *_imu)
                    IMU_ACCEL_Y_SENS_NUM) / IMU_ACCEL_Y_SENS_DEN;
   _imu->accel.z = ((_imu->accel_unscaled.z - _imu->accel_neutral.z) * IMU_ACCEL_Z_SIGN *
                    IMU_ACCEL_Z_SENS_NUM) / IMU_ACCEL_Z_SENS_DEN;
-                   
-  /*
-  //------------------------ add IMU faults ------------------------
-  //Fault_Fac = IMU_ACCEL_X_SIGN * IMU_ACCEL_X_SENS_NUM) / IMU_ACCEL_X_SENS_DEN;
-  _imu->accel.x = _imu->accel.x + (1<<11) ; // 0.5 deg
-  _imu->accel.y = _imu->accel.y + (1<<11) ;
-  _imu->accel.z = _imu->accel.z + (1<<11) ;   
-  //
-  printf("IMU.p : %d\n", _imu->accel.x);               
-  printf("IMU.q : %d\n", _imu->accel.y);               
-  printf("IMU.r : %d\n", _imu->accel.z);     
-  //------------------------ add IMU faults ------------------------
-  */                   
 }
 
 #if defined IMU_MAG_X_CURRENT_COEF && defined IMU_MAG_Y_CURRENT_COEF && defined IMU_MAG_Z_CURRENT_COEF
