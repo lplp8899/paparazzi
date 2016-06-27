@@ -26,8 +26,8 @@
  * and the opencv image functions.
  */
 
-#ifndef OPENCV_CONTOUR_H
-#define OPENCV_CONTOUR_H
+#ifndef OPENCV_CONTOUR_RM_H
+#define OPENCV_CONTOUR_RM_H
 // added by peng
 //#include <opencv2/core/core.hpp>
 //#include <opencv2/imgproc/imgproc.hpp>

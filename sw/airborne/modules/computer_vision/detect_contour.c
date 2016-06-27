@@ -1,5 +1,5 @@
 /*
- * Copyright (C) C. De Wagter
+ * Copyright (C) Peng Lu
  *
  * This file is part of paparazzi
  *
@@ -19,13 +19,15 @@
  */
 /**
  * @file "modules/computer_vision/cv_opencvdemo.c"
- * @author C. De Wagter
+ * @author Peng Lu
  * A simple module showing what you can do with opencv on the bebop.
  */
 
 #include "modules/computer_vision/cv.h"
-#include "modules/computer_vision/cv_opencvdemo.h"
-#include "modules/computer_vision/opencv_example.h"
+#include "modules/computer_vision/detect_contour.h"
+#include "modules/computer_vision/opencv_contour.h"
+//
+
 
 
 // Function
@@ -36,7 +38,7 @@ int opencv_func(struct image_t* img)
   if (img->type == IMAGE_YUV422)
   {
     // Call OpenCV (C++ from paparazzi C function)
-    opencv_example((char*) img->buf, img->w, img->h);
+    find_contour((char*) img->buf, img->w, img->h);
   }
 
 // opencv_example(NULL, 10,10);

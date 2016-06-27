@@ -62,3 +62,24 @@ void grayscale_opencv_to_yuv422(Mat image, char *img, int width, int height)
     }
   }
 }
+
+
+/*
+// added by Peng
+void yuv_opencv_to_yuv422(Mat image, char *img, int width, int height)
+{
+//Turn the opencv RGB colored image back in a YUV colored image for the drone
+  for (int row = 0; row < height; row++) {
+    for (int col = 0; col < width; col++) {
+      // Extract pixel color from image
+      cv::Vec3b &c = image.at<cv::Vec3b>(row, col);
+
+      // Set image buffer values
+      int i = row * width + col;
+      img[2 * i + 1] = c[0]; // y;
+      img[2 * i] = col % 2 ? c[1] : c[2]; // u or v
+    }
+  }
+}
+*/
+

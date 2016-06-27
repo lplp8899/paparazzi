@@ -34,6 +34,10 @@ using namespace std;
 using namespace cv;
 #include "opencv_image_functions.h"
 
+// added by Peng
+//#include <opencv2/highgui/highgui.hpp>
+
+
 int opencv_example(char *img, int width, int height)
 {
   // Create a new image, using the original bebop image.
@@ -50,6 +54,8 @@ int opencv_example(char *img, int width, int height)
   // Canny edges, only works with grayscale image
   int edgeThresh = 35;
   Canny(image, image, edgeThresh, edgeThresh * 3);
+  
+  //imshow("edge image", image);
 
   // Convert back to YUV422, and put it in place of the original image
   grayscale_opencv_to_yuv422(image, img, width, height);

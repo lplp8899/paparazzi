@@ -33,4 +33,7 @@
 
 void color_opencv_to_yuv422(cv::Mat image, char *img, int width, int height);
 void grayscale_opencv_to_yuv422(cv::Mat image, char *img, int width, int height);
+// added by Peng
+//void yuv_opencv_to_yuv422(cv::Mat image, char *img, int width, int height);
+
 #endif
