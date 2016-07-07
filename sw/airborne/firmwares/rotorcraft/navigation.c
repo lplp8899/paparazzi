@@ -697,3 +697,73 @@ void nav_follow(uint8_t ac_id, uint32_t distance, uint32_t height)
 void nav_follow(uint8_t  __attribute__((unused)) _ac_id, uint32_t  __attribute__((unused)) distance,
                 uint32_t  __attribute__((unused)) height) {}
 //#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*-------------------- navigation for vision --------------------*/
+float pos_des_x()
+{
+   float dx = pos_err_x();
+   float x_new = stateGetPositionEnu_f()->x + dx;
+   /*if (x_new < -1.5)
+   {  x_new = -1.5;}
+   if (x_new > 1.5)
+   {  x_new = 1.5;}
+   */
+   //x_new = GetPosX();
+   x_new = stateGetPositionEnu_f()->x;
+   return x_new;
+}
+
+float pos_des_y()
+{
+   float dy = pos_err_y();
+   //float y_new = GetPosY() + dy;
+   float dx = pos_err_x();
+   float y_new = stateGetPositionEnu_f()->y + dx;
+   /*if (y_new < -1.5)
+   {  y_new = -1.5;}
+   if (y_new > 1.5)
+   {  y_new = 1.5;}
+   */
+   y_new = stateGetPositionEnu_f()->y;
+   
+   return y_new;
+}
+
+float pos_des_z()
+{
+   float dz = pos_err_z();
+   float z_new = stateGetPositionEnu_f()->z + dz;
+   if (z_new < -0.)
+   {  z_new = 0.;}
+   if (z_new > 3.5)
+   {  z_new = 3.5;}
+   //z_new = GetPosAlt();
+   return z_new;
+}
+/*
+float vision_distance_est()
+{
+   float dx, dy, dz;
+   pos_err_est_call(dx, dy, dz);
+   float 
+   printf("distance estimate navigation =%f\n", dis_est );
+}
+*/
+
+
+
+
+
+

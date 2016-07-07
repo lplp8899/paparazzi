@@ -98,6 +98,13 @@ extern bool nav_set_heading_towards(float x, float y);
 extern bool nav_set_heading_towards_waypoint(uint8_t wp);
 extern bool nav_set_heading_current(void);
 
+/*-------------------- navigation for vision --------------------*/
+//extern float vision_distance_est(void);
+extern float pos_des_x(void);
+extern float pos_des_y(void);
+extern float pos_des_z(void);
+/*-------------------- navigation for vision --------------------*/
+
 /** default approaching_time for a wp */
 #ifndef CARROT
 #define CARROT 0

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Roland Meertens
+ * Copyright (C) 2016 Peng Lu
  *
  * This file is part of Paparazzi.
  *
@@ -20,20 +20,36 @@
  */
 
 /**
- * @file modules/computer_vision/opencv_image_functions.h
+ * @file modules/computer_vision/opencv_contour.h
  *
  * A small library with functions to convert between the Paparazzi used YUV422 arrays
  * and the opencv image functions.
  */
 
-#ifndef OPENCV_IMAGE_FUNCTIONS_H
-#define OPENCV_IMAGE_FUNCTIONS_H
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#ifndef OPENCV_CONTOUR_H
+#define OPENCV_CONTOUR_H
+// added by peng
+//#include <opencv2/core/core.hpp>
+//#include <opencv2/imgproc/imgproc.hpp>
 
-void color_opencv_to_yuv422(cv::Mat image, char *img, int width, int height);
-void grayscale_opencv_to_yuv422(cv::Mat image, char *img, int width, int height);
-// added by Peng
-//void yuv_opencv_to_yuv422(cv::Mat image, char *img, int width, int height);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int find_contour(char *img, int width, int height);
+
+//---------------------- distance estimate -----------------------//
+//extern void pos_err_est_call(float dx, float dy, float dz);
+extern float pos_err_x(void);
+extern float pos_err_y(void);
+extern float pos_err_z(void);
+extern float distance_est;
+//---------------------- distance estimate -----------------------//
+
+//void yuv_opencv_to_yuv422(CV::Mat image, char *img, int width, int height);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
